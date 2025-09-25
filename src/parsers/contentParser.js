@@ -22,9 +22,9 @@ class ContentParser {
     // 根据网站类型选择解析策略
     switch (this.siteInfo.type) {
       case 'portfolio':
-        return this.parsePortfolioContent($, html);
+        return await this.parsePortfolioContent($, html);
       case 'blog':
-        return this.parseBlogContent($, html);
+        return await this.parseBlogContent($, html);
       case 'news':
         return this.parseNewsContent($, html);
       case 'ecommerce':
@@ -176,13 +176,13 @@ class ContentParser {
   /**
    * 解析博客内容
    */
-  parseBlogContent($, html) {
+  async parseBlogContent($, html) {
     const articles = [];
     const selectors = this.siteInfo.selectors;
 
     // 特殊处理Movable Type博客（如阮一峰的博客）
     if (this.siteInfo.platform === 'movable-type') {
-      return this.parseMovableTypeBlog($, html);
+      return await this.parseMovableTypeBlog($, html);
     }
 
     $(selectors.articles).each((index, element) => {
@@ -212,7 +212,7 @@ class ContentParser {
   /**
    * 解析Movable Type博客内容
    */
-  parseMovableTypeBlog($, html) {
+  async parseMovableTypeBlog($, html) {
     const articles = [];
     const processedLinks = new Set();
 
@@ -249,7 +249,8 @@ class ContentParser {
           pubDate: pubDate,
           guid: this.generateGuid(link),
           author: '阮一峰',
-          category: 'Blog'
+          category: 'Blog',
+          needsFullContent: !content || content.length < 500 // 标记需要获取完整内容
         });
       }
     });
@@ -282,17 +283,164 @@ class ContentParser {
             title: title,
             link: link,
             description: `阮一峰的网络日志：${title}`,
-            content: `<h2>${title}</h2><p>这是阮一峰网络日志的一篇文章，请点击链接查看完整内容。</p>`,
+            content: `<h2>${title}</h2><p>这是阮一峰网络日志的一篇文章。</p>`,
             pubDate: pubDate,
             guid: this.generateGuid(link),
             author: '阮一峰',
-            category: 'Blog'
+            category: 'Blog',
+            needsFullContent: true // 需要获取完整内容
           });
         }
       }
     });
 
+    // 为前5篇文章获取完整内容
+    const articlesToFetch = articles.filter(article => article.needsFullContent).slice(0, 5);
+    
+    for (let i = 0; i < articlesToFetch.length; i++) {
+      const article = articlesToFetch[i];
+      console.log(`Fetching full content for article ${i + 1}/${articlesToFetch.length}: ${article.title}`);
+      
+      try {
+        const fullContent = await this.fetchRuanyifengArticleContent(article.link);
+        if (fullContent) {
+          article.content = fullContent;
+          article.description = this.generateSummary(fullContent.replace(/<[^>]*>/g, ''), 300);
+          console.log(`Successfully fetched content for: ${article.title}`);
+        }
+      } catch (error) {
+        console.error(`Failed to fetch content for ${article.title}:`, error.message);
+      }
+      
+      // 清理needsFullContent标记
+      delete article.needsFullContent;
+    }
+    
+    // 清理其余文章的needsFullContent标记
+    articles.forEach(article => delete article.needsFullContent);
+
     return articles.slice(0, 20); // 限制数量
+  }
+
+  /**
+   * 获取阮一峰文章的完整内容
+   */
+  async fetchRuanyifengArticleContent(articleUrl) {
+    try {
+      const fetch = require('node-fetch');
+      
+      console.log(`Fetching article content from: ${articleUrl}`);
+      
+      const response = await fetch(articleUrl, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; RSSOS/1.0)'
+        },
+        timeout: 10000
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const html = await response.text();
+      const cheerio = require('cheerio');
+      const $page = cheerio.load(html);
+      
+      // 提取文章主体内容
+      let content = '';
+      
+      // 尝试不同的选择器来获取内容
+      const contentSelectors = [
+        '.asset-body',
+        '.entry-content', 
+        '.asset-content',
+        '#main .asset-body',
+        '#content .entry-content'
+      ];
+      
+      for (const selector of contentSelectors) {
+        const contentEl = $page(selector);
+        if (contentEl.length > 0 && contentEl.html()) {
+          content = contentEl.html();
+          console.log(`Found content using selector: ${selector}`);
+          break;
+        }
+      }
+      
+      if (!content) {
+        // 如果没有找到主体内容，尝试获取标题和正文
+        const title = $page('h1, .asset-name, .entry-title').first().text().trim();
+        const paragraphs = [];
+        
+        $page('p').each((index, element) => {
+          const text = $page(element).text().trim();
+          if (text.length > 20 && !text.includes('留言') && !text.includes('Email')) {
+            paragraphs.push(`<p>${text}</p>`);
+          }
+        });
+        
+        if (paragraphs.length > 0) {
+          content = `<h2>${title}</h2>\n${paragraphs.slice(0, 10).join('\n')}`;
+          console.log(`Extracted content from paragraphs: ${paragraphs.length} paragraphs`);
+        }
+      }
+      
+      if (!content || content.length < 100) {
+        console.log('No substantial content found, returning fallback');
+        return null;
+      }
+      
+      // 清理和优化内容
+      content = this.cleanRuanyifengContent(content);
+      
+      console.log(`Successfully extracted ${content.length} characters of content`);
+      return content;
+      
+    } catch (error) {
+      console.error(`Error fetching article content from ${articleUrl}:`, error.message);
+      return null;
+    }
+  }
+  
+  /**
+   * 清理阮一峰文章内容
+   */
+  cleanRuanyifengContent(content) {
+    if (!content) return content;
+    
+    const cheerio = require('cheerio');
+    const $ = cheerio.load(content);
+    
+    // 移除不需要的元素
+    $('.asset-footer, .entry-footer, .comments, #comments, .trackbacks, .related-posts').remove();
+    $('script, style, .advertisement').remove();
+    
+    // 修复图片链接
+    $('img').each((index, element) => {
+      const $img = $(element);
+      let src = $img.attr('src');
+      if (src && !src.startsWith('http')) {
+        if (src.startsWith('/')) {
+          $img.attr('src', `https://www.ruanyifeng.com${src}`);
+        } else {
+          $img.attr('src', `https://www.ruanyifeng.com/blog/${src}`);
+        }
+      }
+      $img.attr('style', 'max-width: 100%; height: auto;');
+    });
+    
+    // 修复链接
+    $('a').each((index, element) => {
+      const $link = $(element);
+      let href = $link.attr('href');
+      if (href && !href.startsWith('http') && !href.startsWith('mailto')) {
+        if (href.startsWith('/')) {
+          $link.attr('href', `https://www.ruanyifeng.com${href}`);
+        }
+      }
+    });
+    
+    return $.html();
   }
 
   /**
