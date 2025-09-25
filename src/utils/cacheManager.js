@@ -194,10 +194,10 @@ class CacheManager {
     const htmlKey = this.generateCacheKey(url, 'html');
     const errorKey = this.generateCacheKey(url, 'error');
     
-    this.rssCache.del(rssKey);
-    this.siteInfoCache.del(siteInfoKey);
-    this.htmlCache.del(htmlKey);
-    this.errorCache.del(errorKey);
+    this.rssCache.delete(rssKey);
+    this.siteInfoCache.delete(siteInfoKey);
+    this.htmlCache.delete(htmlKey);
+    this.errorCache.delete(errorKey);
     
     console.log(`Cleared all cache for ${url}`);
   }
@@ -220,21 +220,21 @@ class CacheManager {
   getCacheStats() {
     return {
       rss: {
-        size: this.rssCache.length,
+        size: this.rssCache.size,
         maxSize: this.rssCache.max,
         hits: this.rssCache.hits || 0,
         misses: this.rssCache.misses || 0
       },
       siteInfo: {
-        size: this.siteInfoCache.length,
+        size: this.siteInfoCache.size,
         maxSize: this.siteInfoCache.max
       },
       html: {
-        size: this.htmlCache.length,
+        size: this.htmlCache.size,
         maxSize: this.htmlCache.max
       },
       error: {
-        size: this.errorCache.length,
+        size: this.errorCache.size,
         maxSize: this.errorCache.max
       }
     };

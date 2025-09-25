@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSSOS - 通用RSS生成器</title>
+    <meta name="description" content="将任何网站转换为RSS订阅源的智能工具">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📡</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">📡</span>
+                <h1>RSSOS</h1>
+            </div>
+            <p class="subtitle">通用RSS生成器</p>
+            <p class="description">🚀 将任何网站转换为RSS订阅源的智能工具</p>
+        </header>
+
+        <main class="main">
+            <div class="generator-section">
+                <div class="input-group">
+                    <label for="urlInput" class="input-label">
+                        <span class="label-text">网站URL</span>
+                        <span class="label-hint">输入您想要生成RSS的网站地址</span>
+                    </label>
+                    <div class="input-container">
+                        <input 
+                            type="url" 
+                            id="urlInput" 
+                            class="url-input" 
+                            placeholder="https://example.com"
+                            autocomplete="url"
+                            spellcheck="false"
+                        >
+                        <button id="generateBtn" class="generate-btn">
+                            <span class="btn-text">生成RSS</span>
+                            <span class="btn-icon">⚡</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="options-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="refreshCache" class="checkbox">
+                        <span class="checkmark"></span>
+                        <span class="checkbox-text">强制刷新缓存</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="loadingSection" class="loading-section hidden">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">正在解析网站...</p>
+                <p class="loading-hint">首次解析可能需要几秒钟</p>
+            </div>
+
+            <div id="resultSection" class="result-section hidden">
+                <div class="result-header">
+                    <h3 class="result-title">RSS生成成功！</h3>
+                    <div class="site-info">
+                        <span id="siteType" class="site-type"></span>
+                        <span id="articleCount" class="article-count"></span>
+                    </div>
+                </div>
+
+                <div class="rss-output">
+                    <div class="output-header">
+                        <label class="output-label">RSS订阅链接</label>
+                        <button id="copyBtn" class="copy-btn" title="复制到剪贴板">
+                            <span class="copy-icon">📋</span>
+                            <span class="copy-text">复制</span>
+                        </button>
+                    </div>
+                    <div class="output-container">
+                        <input type="text" id="rssUrl" class="rss-url" readonly>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <a id="previewBtn" class="action-btn primary" target="_blank">
+                        <span class="btn-icon">👁️</span>
+                        <span class="btn-text">预览RSS</span>
+                    </a>
+                    <button id="downloadBtn" class="action-btn secondary">
+                        <span class="btn-icon">💾</span>
+                        <span class="btn-text">下载RSS</span>
+                    </button>
+                </div>
+
+                <div class="usage-guide">
+                    <h4 class="guide-title">📱 如何使用RSS订阅？</h4>
+                    <div class="guide-content">
+                        <div class="guide-step">
+                            <span class="step-number">1</span>
+                            <span class="step-text">复制上方的RSS链接</span>
+                        </div>
+                        <div class="guide-step">
+                            <span class="step-number">2</span>
+                            <span class="step-text">在RSS阅读器中添加订阅</span>
+                        </div>
+                        <div class="guide-step">
+                            <span class="step-number">3</span>
+                            <span class="step-text">推荐使用：Feedly、Inoreader、NetNewsWire</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorSection" class="error-section hidden">
+                <div class="error-icon">❌</div>
+                <h3 class="error-title">生成失败</h3>
+                <p id="errorMessage" class="error-message"></p>
+                <div class="error-actions">
+                    <button id="retryBtn" class="retry-btn">重试</button>
+                    <button id="reportBtn" class="report-btn">反馈问题</button>
+                </div>
+            </div>
+        </main>
+
+        <section class="features">
+            <h2 class="features-title">🌟 特色功能</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">智能识别</h3>
+                    <p class="feature-desc">自动识别博客、新闻、作品集等不同类型网站</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">高效缓存</h3>
+                    <p class="feature-desc">智能缓存机制，快速响应，减少重复抓取</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">实时更新</h3>
+                    <p class="feature-desc">定期更新RSS内容，确保订阅源保持最新</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌐</div>
+                    <h3 class="feature-title">多平台支持</h3>
+                    <p class="feature-desc">支持WordPress、Medium、GitHub等各种平台</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="examples">
+            <h2 class="examples-title">📖 使用示例</h2>
+            <div class="examples-grid">
+                <div class="example-card" data-url="https://jasonspielman.com">
+                    <div class="example-type">作品集</div>
+                    <h3 class="example-title">设计师作品集</h3>
+                    <p class="example-url">jasonspielman.com</p>
+                    <p class="example-desc">订阅设计师的最新作品和项目更新</p>
+                </div>
+                <div class="example-card" data-url="https://www.ruanyifeng.com/blog/">
+                    <div class="example-type">博客</div>
+                    <h3 class="example-title">技术博客</h3>
+                    <p class="example-url">ruanyifeng.com/blog</p>
+                    <p class="example-desc">获取技术文章和编程教程的最新更新</p>
+                </div>
+                <div class="example-card" data-url="https://github.com/trending">
+                    <div class="example-type">代码</div>
+                    <h3 class="example-title">GitHub趋势</h3>
+                    <p class="example-url">github.com/trending</p>
+                    <p class="example-desc">跟踪最热门的开源项目和代码库</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>关于RSSOS</h4>
+                    <p>开源的通用RSS生成器，让RSS订阅更简单</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">GitHub</a>
+                        <a href="#" class="social-link">文档</a>
+                        <a href="#" class="social-link">API</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>支持的网站类型</h4>
+                    <ul class="support-list">
+                        <li>WordPress博客</li>
+                        <li>设计师作品集</li>
+                        <li>新闻网站</li>
+                        <li>GitHub仓库</li>
+                        <li>电商网站</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>技术支持</h4>
+                    <ul class="support-list">
+                        <li><a href="#" class="footer-link">使用文档</a></li>
+                        <li><a href="#" class="footer-link">API文档</a></li>
+                        <li><a href="#" class="footer-link">问题反馈</a></li>
+                        <li><a href="#" class="footer-link">功能建议</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 RSSOS. MIT License. 让RSS订阅更简单！🚀</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast hidden">
+        <span id="toastMessage" class="toast-message"></span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
