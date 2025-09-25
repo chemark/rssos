@@ -180,6 +180,11 @@ class ContentParser {
     const articles = [];
     const selectors = this.siteInfo.selectors;
 
+    // 特殊处理Movable Type博客（如阮一峰的博客）
+    if (this.siteInfo.platform === 'movable-type') {
+      return this.parseMovableTypeBlog($, html);
+    }
+
     $(selectors.articles).each((index, element) => {
       const $el = $(element);
       
@@ -202,6 +207,92 @@ class ContentParser {
     });
 
     return articles;
+  }
+
+  /**
+   * 解析Movable Type博客内容
+   */
+  parseMovableTypeBlog($, html) {
+    const articles = [];
+    const processedLinks = new Set();
+
+    // 首先解析主要的文章条目（entry-asset）
+    $('.entry-asset').each((index, element) => {
+      const $el = $(element);
+      
+      const titleEl = $el.find('.asset-name.entry-title a, .asset-name.entry-title');
+      const title = titleEl.length > 0 ? titleEl.text().trim() : '';
+      const link = titleEl.is('a') ? this.resolveUrl(titleEl.attr('href')) : this.siteInfo.url;
+      
+      const contentEl = $el.find('.asset-content, .asset-body, .entry-content');
+      const content = contentEl.length > 0 ? contentEl.html() : '';
+      
+      const dateEl = $el.find('.asset-date, .published, time');
+      let pubDate = new Date().toUTCString();
+      if (dateEl.length > 0) {
+        const dateText = dateEl.attr('datetime') || dateEl.text();
+        if (dateText) {
+          const parsedDate = new Date(dateText);
+          if (!isNaN(parsedDate.getTime())) {
+            pubDate = parsedDate.toUTCString();
+          }
+        }
+      }
+      
+      if (title && !processedLinks.has(link)) {
+        processedLinks.add(link);
+        articles.push({
+          title: title,
+          link: link,
+          description: this.generateSummary(content ? $('<div>').html(content).text() : title, 200),
+          content: content || `<p>${title}</p>`,
+          pubDate: pubDate,
+          guid: this.generateGuid(link),
+          author: '阮一峰',
+          category: 'Blog'
+        });
+      }
+    });
+
+    // 然后解析最新文章列表（module-list-item）
+    $('#homepage .module-list-item').each((index, element) => {
+      const $el = $(element);
+      const linkEl = $el.find('a');
+      
+      if (linkEl.length > 0) {
+        const title = linkEl.text().trim();
+        const link = this.resolveUrl(linkEl.attr('href'));
+        
+        // 提取日期信息
+        const dateSpan = $el.find('span').first();
+        let pubDate = new Date().toUTCString();
+        if (dateSpan.length > 0) {
+          const dateText = dateSpan.text().replace('»', '').trim();
+          if (dateText) {
+            const parsedDate = new Date(dateText + ' 00:00:00');
+            if (!isNaN(parsedDate.getTime())) {
+              pubDate = parsedDate.toUTCString();
+            }
+          }
+        }
+        
+        if (title && !processedLinks.has(link) && !title.includes('更多文章')) {
+          processedLinks.add(link);
+          articles.push({
+            title: title,
+            link: link,
+            description: `阮一峰的网络日志：${title}`,
+            content: `<h2>${title}</h2><p>这是阮一峰网络日志的一篇文章，请点击链接查看完整内容。</p>`,
+            pubDate: pubDate,
+            guid: this.generateGuid(link),
+            author: '阮一峰',
+            category: 'Blog'
+          });
+        }
+      }
+    });
+
+    return articles.slice(0, 20); // 限制数量
   }
 
   /**

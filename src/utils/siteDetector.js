@@ -8,6 +8,7 @@ class SiteDetector {
   constructor() {
     this.detectors = [
       this.detectWordPress,
+      this.detectMovableType,
       this.detectMedium,
       this.detectGitHub,
       this.detectNews,
@@ -76,6 +77,54 @@ class SiteDetector {
     return {
       type: 'blog',
       platform: 'wordpress',
+      confidence,
+      selectors,
+      features
+    };
+  }
+
+  /**
+   * 检测Movable Type博客
+   */
+  detectMovableType($, url, html) {
+    let confidence = 0;
+    const selectors = {};
+    const features = [];
+
+    // Movable Type特征检测
+    if ($('meta[name="generator"]').attr('content')?.includes('Movable Type')) {
+      confidence += 50;
+      features.push('movable-type-generator');
+    }
+
+    if (html.includes('sixapart-standard')) {
+      confidence += 30;
+      features.push('sixapart-theme');
+    }
+
+    // 检测阮一峰博客特有结构
+    if (url.includes('ruanyifeng.com') || $('.entry-asset').length > 0) {
+      confidence += 40;
+      features.push('ruanyifeng-blog-structure');
+    }
+
+    if ($('.asset-name.entry-title').length > 0) {
+      confidence += 30;
+      features.push('movable-type-title-structure');
+    }
+
+    if (confidence > 50) {
+      selectors.articles = '.entry-asset, .module-list-item';
+      selectors.title = '.asset-name.entry-title a, .asset-name.entry-title, .module-list-item a';
+      selectors.content = '.asset-content, .entry-content, .asset-body';
+      selectors.date = '.asset-date, .published, time';
+      selectors.link = '.asset-name.entry-title a, .module-list-item a';
+      selectors.summary = '.asset-summary, .entry-summary';
+    }
+
+    return {
+      type: 'blog',
+      platform: 'movable-type',
       confidence,
       selectors,
       features
