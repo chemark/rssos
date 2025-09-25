@@ -8,7 +8,6 @@ class SiteDetector {
   constructor() {
     this.detectors = [
       this.detectWordPress,
-      this.detectBlogger,
       this.detectMedium,
       this.detectGitHub,
       this.detectNews,

@@ -9,28 +9,28 @@ class CacheManager {
     // RSS内容缓存 - 存储生成的RSS XML
     this.rssCache = new LRU({
       max: 100, // 最多缓存100个RSS feed
-      maxAge: 30 * 60 * 1000, // 30分钟过期
+      ttl: 30 * 60 * 1000, // 30分钟过期
       updateAgeOnGet: true
     });
 
     // 网站信息缓存 - 存储网站检测结果
     this.siteInfoCache = new LRU({
       max: 200, // 最多缓存200个网站信息
-      maxAge: 60 * 60 * 1000, // 1小时过期
+      ttl: 60 * 60 * 1000, // 1小时过期
       updateAgeOnGet: true
     });
 
     // HTML内容缓存 - 存储原始HTML
     this.htmlCache = new LRU({
       max: 50, // 最多缓存50个HTML页面
-      maxAge: 15 * 60 * 1000, // 15分钟过期
+      ttl: 15 * 60 * 1000, // 15分钟过期
       updateAgeOnGet: true
     });
 
     // 错误缓存 - 避免频繁请求失败的网站
     this.errorCache = new LRU({
       max: 100,
-      maxAge: 60 * 60 * 1000, // 1小时过期
+      ttl: 60 * 60 * 1000, // 1小时过期
       updateAgeOnGet: false
     });
   }
