@@ -468,23 +468,164 @@ body {
     border-color: #adb5bd;
 }
 
+/* 一键订阅按钮 */
+.subscribe-actions {
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 2px solid #f0f0f0;
+}
+
+.subscribe-title {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.subscribe-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.subscribe-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.subscribe-btn.folo {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.subscribe-btn.reeder {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    box-shadow: 0 4px 15px rgba(238, 90, 82, 0.3);
+}
+
+.subscribe-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.subscribe-btn.folo:hover {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.subscribe-btn.reeder:hover {
+    box-shadow: 0 8px 25px rgba(238, 90, 82, 0.4);
+}
+
+.subscribe-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.subscribe-btn:hover::before {
+    left: 100%;
+}
+
 /* 使用指南 */
 .usage-guide {
     background: #f8f9fa;
-    padding: 25px;
-    border-radius: 12px;
+    padding: 30px;
+    border-radius: 15px;
     border-left: 4px solid #667eea;
 }
 
 .guide-title {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     color: #333;
+    font-size: 1.3rem;
 }
 
 .guide-content {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 25px;
+}
+
+.guide-section {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.guide-subtitle {
+    margin-bottom: 15px;
+    color: #495057;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* 推荐应用区域 */
+.recommended-apps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.app-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.app-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.app-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.app-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.app-info strong {
+    color: #333;
+    font-size: 1rem;
+}
+
+.app-desc {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* 手动步骤区域 */
+.guide-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .guide-step {
@@ -494,8 +635,8 @@ body {
 }
 
 .step-number {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     background: #667eea;
     color: white;
     border-radius: 50%;
@@ -509,6 +650,29 @@ body {
 
 .step-text {
     color: #555;
+    font-size: 0.95rem;
+}
+
+/* 其他应用标签 */
+.other-apps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.app-tag {
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.app-tag:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 /* 错误部分 */
@@ -840,6 +1004,37 @@ body {
     }
     
     .action-btn {
+        justify-content: center;
+    }
+    
+    .subscribe-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .subscribe-btn {
+        width: 100%;
+        max-width: 250px;
+        justify-content: center;
+    }
+    
+    .guide-content {
+        gap: 20px;
+    }
+    
+    .guide-section {
+        padding: 15px;
+    }
+    
+    .recommended-apps {
+        gap: 10px;
+    }
+    
+    .app-item {
+        padding: 10px;
+    }
+    
+    .other-apps {
         justify-content: center;
     }
     

@@ -44,6 +44,8 @@ class RSSGenerator {
         this.copyBtn = document.getElementById('copyBtn');
         this.previewBtn = document.getElementById('previewBtn');
         this.downloadBtn = document.getElementById('downloadBtn');
+        this.foloBtn = document.getElementById('foloBtn');
+        this.reederBtn = document.getElementById('reederBtn');
 
         // 错误元素
         this.errorMessage = document.getElementById('errorMessage');
@@ -83,6 +85,12 @@ class RSSGenerator {
 
         // 反馈按钮
         this.reportBtn.addEventListener('click', () => this.reportIssue());
+
+        // Folo一键订阅
+        this.foloBtn.addEventListener('click', () => this.addToFolo());
+
+        // Reeder一键订阅
+        this.reederBtn.addEventListener('click', () => this.addToReeder());
 
         // 示例卡片点击
         document.querySelectorAll('.example-card').forEach(card => {
@@ -405,6 +413,89 @@ class RSSGenerator {
         const githubUrl = `https://github.com/chemark/rssos/issues/new?title=${title}&body=${body}&labels=bug`;
         
         window.open(githubUrl, '_blank');
+    }
+
+    /**
+     * 一键添加到Folo
+     */
+    addToFolo() {
+        if (!this.rssUrl.value) {
+            this.showToast('请先生成RSS链接', 'error');
+            return;
+        }
+
+        try {
+            // Folo的添加订阅URL scheme
+            // 参考: https://github.com/RSSNext/Follow
+            const foloUrl = `https://app.folo.is/add?url=${encodeURIComponent(this.rssUrl.value)}`;
+            
+            // 尝试打开Folo应用
+            window.open(foloUrl, '_blank');
+            
+            this.showToast('正在打开Folo...', 'success');
+            
+            // 统计点击
+            console.log('Folo subscription initiated:', this.rssUrl.value);
+            
+        } catch (error) {
+            console.error('Failed to open Folo:', error);
+            this.showToast('无法打开Folo，请手动复制RSS链接', 'error');
+        }
+    }
+
+    /**
+     * 一键添加到Reeder
+     */
+    addToReeder() {
+        if (!this.rssUrl.value) {
+            this.showToast('请先生成RSS链接', 'error');
+            return;
+        }
+
+        try {
+            // Reeder的URL scheme
+            // 参考: https://reederapp.com/support/
+            const reederUrl = `reeder://add-feed/${encodeURIComponent(this.rssUrl.value)}`;
+            
+            // 先尝试打开Reeder URL scheme
+            const link = document.createElement('a');
+            link.href = reederUrl;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            
+            // 监听blur事件来检测是否成功打开
+            let appOpened = false;
+            const handleBlur = () => {
+                appOpened = true;
+                window.removeEventListener('blur', handleBlur);
+            };
+            
+            window.addEventListener('blur', handleBlur);
+            
+            // 点击链接
+            link.click();
+            document.body.removeChild(link);
+            
+            // 2秒后检查是否成功打开
+            setTimeout(() => {
+                window.removeEventListener('blur', handleBlur);
+                if (!appOpened) {
+                    // 如果未成功打开，尝试打开Mac App Store
+                    const appStoreUrl = 'https://apps.apple.com/app/reeder-5/id1529448980';
+                    window.open(appStoreUrl, '_blank');
+                    this.showToast('Reeder未安装，正在打开App Store...', 'info');
+                } else {
+                    this.showToast('正在打开Reeder...', 'success');
+                }
+            }, 2000);
+            
+            // 统计点击
+            console.log('Reeder subscription initiated:', this.rssUrl.value);
+            
+        } catch (error) {
+            console.error('Failed to open Reeder:', error);
+            this.showToast('无法打开Reeder，请手动复制RSS链接', 'error');
+        }
     }
 
     /**
