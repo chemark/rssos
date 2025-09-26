@@ -814,29 +814,7 @@ body {
     text-decoration: underline;
 }
 
-.support-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
 
-.support-list li {
-    color: #6b7280;
-    font-size: 0.95rem;
-}
-
-.footer-link {
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.footer-link:hover {
-    color: #1d4ed8;
-    text-decoration: underline;
-}
 
 .footer-bottom {
     text-align: center;
