@@ -34,7 +34,7 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/rssos.git
+git clone https://github.com/chemark/rssos.git
 cd rssos
 
 # 安装依赖
@@ -219,7 +219,7 @@ fetch(rssUrl, { method: 'HEAD' })
 
 ```bash
 # 克隆项目
-git clone https://github.com/yourusername/rssos.git
+git clone https://github.com/chemark/rssos.git
 cd rssos
 
 # 安装依赖
@@ -244,9 +244,9 @@ npm run dev
 
 ## 📞 联系方式
 
-- 项目主页：https://github.com/yourusername/rssos
-- 问题反馈：https://github.com/yourusername/rssos/issues
-- 邮箱：your.email@example.com
+- 项目主页：https://github.com/chemark/rssos
+- 问题反馈：https://github.com/chemark/rssos/issues
+- 在线体验：https://rssos.vercel.app
 
 ## 🎯 路线图
 
