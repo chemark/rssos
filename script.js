@@ -400,11 +400,11 @@ class RSSGenerator {
      * 反馈问题
      */
     reportIssue() {
-        const subject = encodeURIComponent('RSSOS RSS生成问题反馈');
-        const body = encodeURIComponent(`URL: ${this.urlInput.value}\n错误信息: ${this.errorMessage.textContent}\n\n请描述遇到的问题：`);
-        const mailto = `mailto:support@example.com?subject=${subject}&body=${body}`;
+        const title = encodeURIComponent('RSSOS RSS生成问题反馈');
+        const body = encodeURIComponent(`**问题URL:** ${this.urlInput.value}\n\n**错误信息:**\n${this.errorMessage.textContent}\n\n**问题描述:**\n请描述您遇到的问题...\n\n**浏览器信息:**\n${navigator.userAgent}\n\n**时间:**\n${new Date().toLocaleString()}`);
+        const githubUrl = `https://github.com/chemark/rssos/issues/new?title=${title}&body=${body}&labels=bug`;
         
-        window.open(mailto);
+        window.open(githubUrl, '_blank');
     }
 
     /**
